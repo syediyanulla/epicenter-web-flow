@@ -45,24 +45,26 @@ const Index = () => {
         <div className="absolute inset-0 lg:left-1/2 pointer-events-auto">
           <FlowingConnections />
         </div>
-        <div className="relative z-10 max-w-7xl mx-auto w-full px-6 md:px-12 lg:px-24 py-20">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left: Text Content */}
-            <div className="space-y-8 animate-fade-up bg-background/95 backdrop-blur-sm p-8 rounded-2xl">
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight text-foreground">
-                We place people at the{" "}
-                <span className="text-primary">epicentre</span> of healthcare.
-              </h1>
-              <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-2xl">
-                We believe there will be a convergence of industries in the future delivery of healthcare services, and we will be at the epicentre of it.
-              </p>
-              <MagneticButton size="lg" onClick={scrollToContact}>
-                Discover Why We're Different
-              </MagneticButton>
-            </div>
+        <div className="relative z-10 w-full px-6 md:px-12 lg:px-24 py-20">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              {/* Left: Text Content */}
+              <div className="space-y-8 animate-fade-up">
+                <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight text-foreground">
+                  We place people at the{" "}
+                  <span className="text-primary">epicentre</span> of healthcare.
+                </h1>
+                <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-2xl">
+                  We believe there will be a convergence of industries in the future delivery of healthcare services, and we will be at the epicentre of it.
+                </p>
+                <MagneticButton size="lg" onClick={scrollToContact}>
+                  Discover Why We're Different
+                </MagneticButton>
+              </div>
 
-            {/* Right: Space for Animation (background) */}
-            <div className="relative min-h-[500px] lg:min-h-[600px]" />
+              {/* Right: Space for Animation (background) */}
+              <div className="relative min-h-[500px] lg:min-h-[600px]" />
+            </div>
           </div>
         </div>
       </section>
