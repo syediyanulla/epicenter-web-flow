@@ -126,8 +126,7 @@ export const FlowingConnections = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="w-full h-full"
-      style={{ minHeight: "500px" }}
+      className="w-full h-full absolute inset-0"
     />
   );
 };

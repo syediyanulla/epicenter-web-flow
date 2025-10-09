@@ -41,11 +41,14 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center px-6 md:px-12 lg:px-24 py-20">
-        <div className="max-w-7xl mx-auto w-full">
+      <section className="relative min-h-screen flex items-center overflow-hidden">
+        <div className="absolute inset-0 lg:left-1/2 pointer-events-auto">
+          <FlowingConnections />
+        </div>
+        <div className="relative z-10 max-w-7xl mx-auto w-full px-6 md:px-12 lg:px-24 py-20">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left: Text Content */}
-            <div className="space-y-8 animate-fade-up">
+            <div className="space-y-8 animate-fade-up bg-background/95 backdrop-blur-sm p-8 rounded-2xl">
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight text-foreground">
                 We place people at the{" "}
                 <span className="text-primary">epicentre</span> of healthcare.
@@ -58,10 +61,8 @@ const Index = () => {
               </MagneticButton>
             </div>
 
-            {/* Right: Dynamic Animation */}
-            <div className="relative h-[500px] lg:h-[600px] rounded-2xl overflow-hidden shadow-large">
-              <FlowingConnections />
-            </div>
+            {/* Right: Space for Animation (background) */}
+            <div className="relative min-h-[500px] lg:min-h-[600px]" />
           </div>
         </div>
       </section>
