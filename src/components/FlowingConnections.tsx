@@ -101,6 +101,98 @@ export const FlowingConnections = () => {
     const centerX = canvas.offsetWidth / 2;
     const centerY = canvas.offsetHeight / 2;
 
+    // Emergency Icons System
+    class EmergencyIcon {
+      x: number;
+      y: number;
+      opacity: number;
+      phase: number;
+      lifetime: number;
+      age: number;
+
+      constructor() {
+        // Random position on the map area
+        this.x = canvas.offsetWidth * (0.2 + Math.random() * 0.6);
+        this.y = canvas.offsetHeight * (0.2 + Math.random() * 0.6);
+        this.opacity = 0;
+        this.phase = 0;
+        this.lifetime = 120; // frames (about 2 seconds at 60fps)
+        this.age = 0;
+      }
+
+      update() {
+        this.age++;
+        this.phase += 0.1;
+
+        // Fade in, stay, fade out
+        if (this.age < 15) {
+          // Fade in
+          this.opacity = this.age / 15;
+        } else if (this.age > this.lifetime - 15) {
+          // Fade out
+          this.opacity = (this.lifetime - this.age) / 15;
+        } else {
+          // Stay visible
+          this.opacity = 1;
+        }
+      }
+
+      draw() {
+        if (!ctx || this.opacity <= 0) return;
+
+        const size = 8;
+        const glowSize = 12 + Math.sin(this.phase) * 2;
+
+        // Draw outer glow
+        const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, glowSize);
+        gradient.addColorStop(0, `rgba(253, 126, 20, ${this.opacity * 0.6})`);
+        gradient.addColorStop(0.5, `rgba(253, 126, 20, ${this.opacity * 0.3})`);
+        gradient.addColorStop(1, "rgba(253, 126, 20, 0)");
+        
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, glowSize, 0, Math.PI * 2);
+        ctx.fillStyle = gradient;
+        ctx.fill();
+
+        // Draw emergency cross
+        ctx.strokeStyle = `rgba(253, 126, 20, ${this.opacity})`;
+        ctx.lineWidth = 2;
+        ctx.lineCap = "round";
+
+        // Vertical line
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y - size);
+        ctx.lineTo(this.x, this.y + size);
+        ctx.stroke();
+
+        // Horizontal line
+        ctx.beginPath();
+        ctx.moveTo(this.x - size, this.y);
+        ctx.lineTo(this.x + size, this.y);
+        ctx.stroke();
+
+        // Draw "ping" ring on appearance
+        if (this.age < 20) {
+          const ringRadius = (this.age / 20) * 20;
+          const ringOpacity = (1 - this.age / 20) * this.opacity * 0.5;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, ringRadius, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(253, 126, 20, ${ringOpacity})`;
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        }
+      }
+
+      isDead() {
+        return this.age >= this.lifetime;
+      }
+    }
+
+    // Emergency icons array
+    const emergencyIcons: EmergencyIcon[] = [];
+    let iconSpawnTimer = 0;
+    const iconSpawnInterval = 80; // frames between spawns
+
     const drawGeometricOverlays = () => {
       // Draw subtle hexagons
       for (let i = 0; i < 3; i++) {
@@ -151,6 +243,47 @@ export const FlowingConnections = () => {
       ctx.fill();
     };
 
+    const drawStylizedMap = () => {
+      const gridSpacing = 80;
+      const mapOpacity = 0.06 + Math.sin(geometricPhase * 0.3) * 0.02;
+      
+      ctx.strokeStyle = `rgba(0, 123, 255, ${mapOpacity})`;
+      ctx.lineWidth = 0.5;
+      ctx.setLineDash([3, 6]);
+
+      // Vertical lines
+      for (let x = gridSpacing; x < canvas.offsetWidth; x += gridSpacing) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.offsetHeight);
+        ctx.stroke();
+      }
+
+      // Horizontal lines
+      for (let y = gridSpacing; y < canvas.offsetHeight; y += gridSpacing) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.offsetWidth, y);
+        ctx.stroke();
+      }
+
+      ctx.setLineDash([]);
+
+      // Draw some abstract "roads" - diagonal lines
+      ctx.strokeStyle = `rgba(0, 123, 255, ${mapOpacity * 1.5})`;
+      ctx.lineWidth = 1;
+      
+      ctx.beginPath();
+      ctx.moveTo(canvas.offsetWidth * 0.1, canvas.offsetHeight * 0.3);
+      ctx.lineTo(canvas.offsetWidth * 0.9, canvas.offsetHeight * 0.7);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(canvas.offsetWidth * 0.2, canvas.offsetHeight * 0.8);
+      ctx.lineTo(canvas.offsetWidth * 0.8, canvas.offsetHeight * 0.2);
+      ctx.stroke();
+    };
+
     // Animation loop
     const animate = () => {
       ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
@@ -158,6 +291,7 @@ export const FlowingConnections = () => {
       // Draw geometric overlays (background layer)
       drawGeometricOverlays();
       drawDigitalHeartbeat();
+      drawStylizedMap();
 
       // Update and draw particles
       particles.forEach((particle) => {
@@ -196,6 +330,24 @@ export const FlowingConnections = () => {
           ctx.moveTo(p1.x, p1.y);
           ctx.lineTo(mouse.x, mouse.y);
           ctx.stroke();
+        }
+      });
+
+      // Manage emergency icons
+      iconSpawnTimer++;
+      if (iconSpawnTimer >= iconSpawnInterval) {
+        emergencyIcons.push(new EmergencyIcon());
+        iconSpawnTimer = 0;
+      }
+
+      // Update and draw emergency icons
+      emergencyIcons.forEach((icon, index) => {
+        icon.update();
+        icon.draw();
+        
+        // Remove dead icons
+        if (icon.isDead()) {
+          emergencyIcons.splice(index, 1);
         }
       });
 
