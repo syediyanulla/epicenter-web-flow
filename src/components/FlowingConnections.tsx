@@ -101,8 +101,8 @@ export const FlowingConnections = () => {
     const centerX = canvas.offsetWidth / 2;
     const centerY = canvas.offsetHeight / 2;
 
-    // Emergency Icons System
-    class EmergencyIcon {
+    // Map Pin Icons System
+    class MapPinIcon {
       x: number;
       y: number;
       opacity: number;
@@ -140,8 +140,9 @@ export const FlowingConnections = () => {
       draw() {
         if (!ctx || this.opacity <= 0) return;
 
-        const size = 8;
-        const glowSize = 12 + Math.sin(this.phase) * 2;
+        const pinHeight = 24;
+        const pinWidth = 16;
+        const glowSize = 20 + Math.sin(this.phase) * 3;
 
         // Draw outer glow
         const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, glowSize);
@@ -154,31 +155,38 @@ export const FlowingConnections = () => {
         ctx.fillStyle = gradient;
         ctx.fill();
 
-        // Draw emergency cross
+        // Draw map pin shape
+        ctx.fillStyle = `rgba(253, 126, 20, ${this.opacity})`;
         ctx.strokeStyle = `rgba(253, 126, 20, ${this.opacity})`;
         ctx.lineWidth = 2;
-        ctx.lineCap = "round";
 
-        // Vertical line
+        // Pin body (teardrop shape)
         ctx.beginPath();
-        ctx.moveTo(this.x, this.y - size);
-        ctx.lineTo(this.x, this.y + size);
-        ctx.stroke();
+        ctx.ellipse(this.x, this.y - pinHeight/3, pinWidth/2, pinHeight/2.5, 0, 0, Math.PI * 2);
+        ctx.fill();
 
-        // Horizontal line
+        // Pin point (bottom triangle)
         ctx.beginPath();
-        ctx.moveTo(this.x - size, this.y);
-        ctx.lineTo(this.x + size, this.y);
-        ctx.stroke();
+        ctx.moveTo(this.x - pinWidth/4, this.y - pinHeight/6);
+        ctx.lineTo(this.x + pinWidth/4, this.y - pinHeight/6);
+        ctx.lineTo(this.x, this.y + pinHeight/3);
+        ctx.closePath();
+        ctx.fill();
+
+        // Inner circle (the center dot)
+        ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity * 0.9})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y - pinHeight/3, pinWidth/4, 0, Math.PI * 2);
+        ctx.fill();
 
         // Draw "ping" ring on appearance
         if (this.age < 20) {
-          const ringRadius = (this.age / 20) * 20;
+          const ringRadius = (this.age / 20) * 25;
           const ringOpacity = (1 - this.age / 20) * this.opacity * 0.5;
           ctx.beginPath();
           ctx.arc(this.x, this.y, ringRadius, 0, Math.PI * 2);
           ctx.strokeStyle = `rgba(253, 126, 20, ${ringOpacity})`;
-          ctx.lineWidth = 1.5;
+          ctx.lineWidth = 2;
           ctx.stroke();
         }
       }
@@ -188,8 +196,8 @@ export const FlowingConnections = () => {
       }
     }
 
-    // Emergency icons array
-    const emergencyIcons: EmergencyIcon[] = [];
+    // Map pin icons array
+    const mapPinIcons: MapPinIcon[] = [];
     let iconSpawnTimer = 0;
     const iconSpawnInterval = 80; // frames between spawns
 
@@ -333,21 +341,21 @@ export const FlowingConnections = () => {
         }
       });
 
-      // Manage emergency icons
+      // Manage map pin icons
       iconSpawnTimer++;
       if (iconSpawnTimer >= iconSpawnInterval) {
-        emergencyIcons.push(new EmergencyIcon());
+        mapPinIcons.push(new MapPinIcon());
         iconSpawnTimer = 0;
       }
 
-      // Update and draw emergency icons
-      emergencyIcons.forEach((icon, index) => {
+      // Update and draw map pin icons
+      mapPinIcons.forEach((icon, index) => {
         icon.update();
         icon.draw();
         
         // Remove dead icons
         if (icon.isDead()) {
-          emergencyIcons.splice(index, 1);
+          mapPinIcons.splice(index, 1);
         }
       });
 

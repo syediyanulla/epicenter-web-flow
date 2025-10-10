@@ -1,3 +1,4 @@
+import { Header } from "@/components/Header";
 import { FlowingConnections } from "@/components/FlowingConnections";
 import { ServiceCard } from "@/components/ServiceCard";
 import { ProcessStep } from "@/components/ProcessStep";
@@ -11,7 +12,7 @@ const Index = () => {
 
   const testimonials = [
     {
-      quote: "Hunter Healthcare has been instrumental in our success. Their understanding of the sector is second to none.",
+      quote: "Cure-On has been instrumental in our success. Their understanding of the sector is second to none.",
       author: "Sarah Mitchell",
       role: "Chief Medical Officer, City General Hospital"
     },
@@ -40,8 +41,10 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Header />
+      
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center overflow-hidden">
+      <section className="relative min-h-screen flex items-center overflow-hidden pt-20">
         <div className="absolute inset-0 lg:left-1/2 pointer-events-auto">
           <FlowingConnections />
         </div>
@@ -70,7 +73,7 @@ const Index = () => {
       </section>
 
       {/* Services Section */}
-      <section className="px-6 md:px-12 lg:px-24 py-24 bg-muted">
+      <section id="services" className="px-6 md:px-12 lg:px-24 py-24 bg-muted">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-bold text-center mb-6 text-foreground">
             A New Standard in Healthcare Solutions
@@ -103,7 +106,7 @@ const Index = () => {
       </section>
 
       {/* Process Section */}
-      <section className="px-6 md:px-12 lg:px-24 py-24">
+      <section id="process" className="px-6 md:px-12 lg:px-24 py-24">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-bold text-center mb-6 text-foreground">
             Our Proven Process
@@ -285,7 +288,7 @@ const Index = () => {
           <div className="grid md:grid-cols-4 gap-12 mb-12">
             {/* Logo & Mission */}
             <div className="md:col-span-2">
-              <h3 className="text-2xl font-bold mb-4">Hunter Healthcare</h3>
+              <h3 className="text-2xl font-bold mb-4">Cure-On</h3>
               <p className="text-background/80 leading-relaxed mb-6">
                 Placing people at the epicentre of healthcare. We believe in the convergence of industries for the future delivery of healthcare services.
               </p>
@@ -312,8 +315,8 @@ const Index = () => {
                 </li>
                 <li className="flex items-center gap-2">
                   <Mail className="w-5 h-5 flex-shrink-0" />
-                  <a href="mailto:info@hunterhealthcare.com" className="text-background/80 hover:text-background transition-colors">
-                    info@hunterhealthcare.com
+                  <a href="mailto:info@cureon.com" className="text-background/80 hover:text-background transition-colors">
+                    info@cureon.com
                   </a>
                 </li>
               </ul>
@@ -330,7 +333,7 @@ const Index = () => {
           </div>
           
           <div className="border-t border-background/20 pt-8 text-center text-background/60">
-            <p>&copy; {new Date().getFullYear()} Hunter Healthcare. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} Cure-On. All rights reserved.</p>
           </div>
         </div>
       </footer>
