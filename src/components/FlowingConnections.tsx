@@ -96,10 +96,126 @@ export const FlowingConnections = () => {
     };
     canvas.addEventListener("mousemove", handleMouseMove);
 
-    // Geometric overlays
+    // Geometric overlays and map visualization
     let geometricPhase = 0;
+    let ambulanceProgress = 0;
     const centerX = canvas.offsetWidth / 2;
     const centerY = canvas.offsetHeight / 2;
+    
+    // Emergency event location (top right area)
+    const emergencyX = centerX + canvas.offsetWidth * 0.25;
+    const emergencyY = centerY - canvas.offsetHeight * 0.15;
+    
+    // Ambulance start location (bottom left area)
+    const ambulanceStartX = centerX - canvas.offsetWidth * 0.2;
+    const ambulanceStartY = centerY + canvas.offsetHeight * 0.2;
+
+    const drawStyleizedMap = () => {
+      // Draw abstract grid/road pattern
+      ctx.strokeStyle = `rgba(0, 123, 255, 0.08)`;
+      ctx.lineWidth = 0.5;
+      
+      const gridSize = 80;
+      const startX = centerX - canvas.offsetWidth * 0.3;
+      const endX = centerX + canvas.offsetWidth * 0.3;
+      const startY = centerY - canvas.offsetHeight * 0.25;
+      const endY = centerY + canvas.offsetHeight * 0.25;
+      
+      // Vertical lines
+      for (let x = startX; x <= endX; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, startY);
+        ctx.lineTo(x, endY);
+        ctx.stroke();
+      }
+      
+      // Horizontal lines
+      for (let y = startY; y <= endY; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(startX, y);
+        ctx.lineTo(endX, y);
+        ctx.stroke();
+      }
+    };
+
+    const drawEmergencyEvent = () => {
+      // Pulsating emergency icon (coral)
+      const pulseScale = (Math.sin(geometricPhase * 2) + 1) / 2;
+      const emergencyRadius = 8 + pulseScale * 4;
+      
+      // Outer glow
+      const gradient = ctx.createRadialGradient(
+        emergencyX, emergencyY, 0,
+        emergencyX, emergencyY, emergencyRadius * 2
+      );
+      gradient.addColorStop(0, `rgba(253, 126, 20, ${0.6 * pulseScale})`);
+      gradient.addColorStop(1, "rgba(253, 126, 20, 0)");
+      
+      ctx.beginPath();
+      ctx.arc(emergencyX, emergencyY, emergencyRadius * 2, 0, Math.PI * 2);
+      ctx.fillStyle = gradient;
+      ctx.fill();
+      
+      // Core dot
+      ctx.beginPath();
+      ctx.arc(emergencyX, emergencyY, 5, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(253, 126, 20, 0.9)";
+      ctx.fill();
+      
+      // Emergency cross symbol
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(emergencyX - 3, emergencyY);
+      ctx.lineTo(emergencyX + 3, emergencyY);
+      ctx.moveTo(emergencyX, emergencyY - 3);
+      ctx.lineTo(emergencyX, emergencyY + 3);
+      ctx.stroke();
+    };
+
+    const drawAmbulancePath = () => {
+      // Calculate current ambulance position
+      const currentX = ambulanceStartX + (emergencyX - ambulanceStartX) * ambulanceProgress;
+      const currentY = ambulanceStartY + (emergencyY - ambulanceStartY) * ambulanceProgress;
+      
+      // Draw the route path (with subtle dash pattern)
+      ctx.strokeStyle = `rgba(0, 123, 255, 0.3)`;
+      ctx.lineWidth = 2;
+      ctx.setLineDash([10, 5]);
+      ctx.beginPath();
+      ctx.moveTo(ambulanceStartX, ambulanceStartY);
+      ctx.lineTo(currentX, currentY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      
+      // Draw ambulance icon (moving dot with trail)
+      if (ambulanceProgress > 0.05) {
+        // Ambulance glow
+        const ambGradient = ctx.createRadialGradient(
+          currentX, currentY, 0,
+          currentX, currentY, 12
+        );
+        ambGradient.addColorStop(0, "rgba(0, 123, 255, 0.6)");
+        ambGradient.addColorStop(1, "rgba(0, 123, 255, 0)");
+        
+        ctx.beginPath();
+        ctx.arc(currentX, currentY, 12, 0, Math.PI * 2);
+        ctx.fillStyle = ambGradient;
+        ctx.fill();
+        
+        // Ambulance core
+        ctx.beginPath();
+        ctx.arc(currentX, currentY, 4, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(0, 123, 255, 0.9)";
+        ctx.fill();
+      }
+      
+      // Update ambulance progress
+      ambulanceProgress += 0.003;
+      if (ambulanceProgress > 1) {
+        ambulanceProgress = 0; // Reset for continuous loop
+      }
+    };
 
     const drawGeometricOverlays = () => {
       // Draw subtle hexagons
@@ -155,6 +271,9 @@ export const FlowingConnections = () => {
     const animate = () => {
       ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
 
+      // Draw map and ambulance visualization (bottom layer)
+      drawStyleizedMap();
+      
       // Draw geometric overlays (background layer)
       drawGeometricOverlays();
       drawDigitalHeartbeat();
@@ -198,6 +317,10 @@ export const FlowingConnections = () => {
           ctx.stroke();
         }
       });
+
+      // Draw ambulance service visualization (top layer)
+      drawAmbulancePath();
+      drawEmergencyEvent();
 
       // Update geometric phase
       geometricPhase += 0.01;
