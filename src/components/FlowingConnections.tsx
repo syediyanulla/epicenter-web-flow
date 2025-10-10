@@ -27,6 +27,8 @@ export const FlowingConnections = () => {
       vy: number;
       radius: number;
       color: string;
+      isDataNode: boolean;
+      pulsePhase: number;
 
       constructor() {
         this.x = Math.random() * canvas.offsetWidth;
@@ -35,6 +37,8 @@ export const FlowingConnections = () => {
         this.vy = (Math.random() - 0.5) * 0.5;
         this.radius = Math.random() * 2 + 1;
         this.color = Math.random() > 0.5 ? "rgba(253, 126, 20, 0.6)" : "rgba(0, 123, 255, 0.6)";
+        this.isDataNode = Math.random() > 0.85; // 15% are data nodes
+        this.pulsePhase = Math.random() * Math.PI * 2;
       }
 
       update() {
@@ -43,14 +47,36 @@ export const FlowingConnections = () => {
 
         if (this.x < 0 || this.x > canvas.offsetWidth) this.vx *= -1;
         if (this.y < 0 || this.y > canvas.offsetHeight) this.vy *= -1;
+
+        // Update pulse phase for data nodes
+        if (this.isDataNode) {
+          this.pulsePhase += 0.05;
+        }
       }
 
       draw() {
         if (!ctx) return;
+        
+        // Draw regular particle
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         ctx.fillStyle = this.color;
         ctx.fill();
+
+        // Draw pulsating glow for data nodes
+        if (this.isDataNode) {
+          const pulseIntensity = (Math.sin(this.pulsePhase) + 1) / 2;
+          const glowRadius = this.radius + pulseIntensity * 4;
+          
+          const gradient = ctx.createRadialGradient(this.x, this.y, this.radius, this.x, this.y, glowRadius);
+          gradient.addColorStop(0, this.color);
+          gradient.addColorStop(1, "rgba(253, 126, 20, 0)");
+          
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, glowRadius, 0, Math.PI * 2);
+          ctx.fillStyle = gradient;
+          ctx.fill();
+        }
       }
     }
 
@@ -70,9 +96,68 @@ export const FlowingConnections = () => {
     };
     canvas.addEventListener("mousemove", handleMouseMove);
 
+    // Geometric overlays
+    let geometricPhase = 0;
+    const centerX = canvas.offsetWidth / 2;
+    const centerY = canvas.offsetHeight / 2;
+
+    const drawGeometricOverlays = () => {
+      // Draw subtle hexagons
+      for (let i = 0; i < 3; i++) {
+        const hexSize = 60 + i * 40;
+        const opacity = 0.03 + (Math.sin(geometricPhase + i * 0.5) + 1) * 0.015;
+        
+        ctx.beginPath();
+        for (let j = 0; j < 6; j++) {
+          const angle = (Math.PI / 3) * j + geometricPhase * 0.2;
+          const x = centerX + hexSize * Math.cos(angle);
+          const y = centerY + hexSize * Math.sin(angle);
+          if (j === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.strokeStyle = `rgba(0, 123, 255, ${opacity})`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      // Draw subtle circuitry lines
+      ctx.strokeStyle = `rgba(0, 123, 255, ${0.04 + Math.sin(geometricPhase) * 0.02})`;
+      ctx.lineWidth = 0.5;
+      ctx.setLineDash([5, 10]);
+      
+      for (let i = 0; i < 2; i++) {
+        const y = centerY + (i - 0.5) * 100;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.offsetWidth, y);
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);
+    };
+
+    const drawDigitalHeartbeat = () => {
+      const pulseScale = (Math.sin(geometricPhase * 0.5) + 1) / 2;
+      const pulseRadius = 30 + pulseScale * 20;
+      
+      // Central pulse
+      const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, pulseRadius);
+      gradient.addColorStop(0, `rgba(253, 126, 20, ${0.1 * pulseScale})`);
+      gradient.addColorStop(1, "rgba(253, 126, 20, 0)");
+      
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, pulseRadius, 0, Math.PI * 2);
+      ctx.fillStyle = gradient;
+      ctx.fill();
+    };
+
     // Animation loop
     const animate = () => {
       ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
+
+      // Draw geometric overlays (background layer)
+      drawGeometricOverlays();
+      drawDigitalHeartbeat();
 
       // Update and draw particles
       particles.forEach((particle) => {
@@ -89,8 +174,10 @@ export const FlowingConnections = () => {
 
           if (distance < 150) {
             ctx.beginPath();
-            ctx.strokeStyle = `rgba(0, 123, 255, ${0.2 * (1 - distance / 150)})`;
-            ctx.lineWidth = 1;
+            // Enhanced connection for data nodes
+            const opacity = (p1.isDataNode || p2.isDataNode) ? 0.3 : 0.2;
+            ctx.strokeStyle = `rgba(0, 123, 255, ${opacity * (1 - distance / 150)})`;
+            ctx.lineWidth = (p1.isDataNode && p2.isDataNode) ? 1.5 : 1;
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
             ctx.stroke();
@@ -111,6 +198,9 @@ export const FlowingConnections = () => {
           ctx.stroke();
         }
       });
+
+      // Update geometric phase
+      geometricPhase += 0.01;
 
       requestAnimationFrame(animate);
     };
