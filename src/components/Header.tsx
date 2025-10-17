@@ -1,9 +1,21 @@
 import { Heart } from "lucide-react";
 import { Button } from "./ui/button";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export const Header = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isHomePage = location.pathname === "/";
+
   const scrollToSection = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    if (!isHomePage) {
+      navigate("/");
+      setTimeout(() => {
+        document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    } else {
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   return (
@@ -23,29 +35,40 @@ export const Header = () => {
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center gap-8">
-            <button
-              onClick={() => scrollToSection("services")}
-              className="text-foreground/80 hover:text-foreground transition-colors font-medium"
-            >
-              Services
-            </button>
-            <button
-              onClick={() => scrollToSection("process")}
-              className="text-foreground/80 hover:text-foreground transition-colors font-medium"
-            >
-              About
-            </button>
-            <button
-              onClick={() => scrollToSection("contact")}
-              className="text-foreground/80 hover:text-foreground transition-colors font-medium"
-            >
-              Contact
-            </button>
+            {isHomePage ? (
+              <>
+                <button
+                  onClick={() => scrollToSection("services")}
+                  className="text-foreground/80 hover:text-foreground transition-colors font-medium"
+                >
+                  Services
+                </button>
+                <button
+                  onClick={() => scrollToSection("process")}
+                  className="text-foreground/80 hover:text-foreground transition-colors font-medium"
+                >
+                  About
+                </button>
+                <button
+                  onClick={() => scrollToSection("contact")}
+                  className="text-foreground/80 hover:text-foreground transition-colors font-medium"
+                >
+                  Contact
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => navigate("/")}
+                className="text-foreground/80 hover:text-foreground transition-colors font-medium"
+              >
+                Home
+              </button>
+            )}
             <Button
-              onClick={() => scrollToSection("contact")}
-              className="bg-secondary hover:bg-secondary/90 text-white"
+              onClick={() => navigate("/dashboard")}
+              className="bg-primary hover:bg-primary/90 text-white"
             >
-              Get Started
+              Dashboard
             </Button>
           </nav>
 
