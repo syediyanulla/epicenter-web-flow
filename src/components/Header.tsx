@@ -66,9 +66,9 @@ export const Header = () => {
             )}
             <Button
               onClick={() => navigate("/dashboard")}
-              className="bg-primary hover:bg-primary/90 text-white"
+              className="bg-secondary hover:bg-secondary/90 text-white"
             >
-              Dashboard
+              Get Started
             </Button>
           </nav>
 

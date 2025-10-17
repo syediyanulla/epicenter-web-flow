@@ -6,9 +6,11 @@ import { TeamMember } from "@/components/TeamMember";
 import { MagneticButton } from "@/components/MagneticButton";
 import { Users, Compass, Settings, Heart, Network, Award, Mail, MapPin, Linkedin, Twitter } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const navigate = useNavigate();
 
   const testimonials = [
     {
@@ -60,7 +62,7 @@ const Index = () => {
                 <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-2xl">
                   We believe there will be a convergence of industries in the future delivery of healthcare services, and we will be at the epicentre of it.
                 </p>
-                <MagneticButton size="lg" onClick={scrollToContact}>
+                <MagneticButton size="lg" onClick={() => navigate("/dashboard")}>
                   Discover Why We're Different
                 </MagneticButton>
               </div>
